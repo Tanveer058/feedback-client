@@ -26,7 +26,7 @@ import { adminAPI } from '../services/api';
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({ 
-    username: '', 
+    email: '', 
     password: '' 
   });
   const [loading, setLoading] = useState(false);
@@ -51,7 +51,7 @@ const AdminLogin = () => {
     setError('');
 
     // Basic validation
-    if (!formData.username.trim() || !formData.password.trim()) {
+    if (!formData.email.trim() || !formData.password.trim()) {
       setError('Please fill in all fields');
       setLoading(false);
       return;
@@ -83,7 +83,7 @@ const AdminLogin = () => {
 
   const handleDemoLogin = () => {
     setFormData({
-      username: 'admin@example.com',
+      email: 'admin@example.com',
       password: 'admin123'
     });
   };
@@ -216,12 +216,12 @@ const AdminLogin = () => {
 
               {/* Login Form */}
               <form onSubmit={handleSubmit}>
-                {/* Username Field */}
+                {/* email Field */}
                 <TextField
                   fullWidth
-                  label="Username"
-                  name="username"
-                  value={formData.username}
+                  label="email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
                   margin="normal"
                   required
@@ -344,7 +344,7 @@ const AdminLogin = () => {
                   Demo Credentials
                 </Typography>
                 <Typography variant="caption" display="block" color="warning.dark">
-                  Username: <strong>admin@example.com</strong>
+                  email: <strong>admin@example.com</strong>
                 </Typography>
                 <Typography variant="caption" display="block" color="warning.dark">
                   Password: <strong>admin123</strong>
