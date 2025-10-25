@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// const API_URL = 'http://localhost:5000/api'; // Localhost URL
-const API_URL = 'https://feedback-server-six.vercel.app/api';  // Production URL 
+const API_URL = 'http://localhost:5000/api'; // Localhost URL
+// const API_URL = 'https://feedback-server-six.vercel.app/api';  // Production URL 
 
 // Create axios instance
 const api = axios.create({

@@ -6,7 +6,6 @@ import PrivateRoute from '../utils/PrivateRoute';
 const AdminPanel = () => {
   return (
     <>
-      <Navbar />
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <PrivateRoute>
           <Dashboard />

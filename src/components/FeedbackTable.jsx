@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -8,151 +8,178 @@ import {
   TableRow,
   Paper,
   IconButton,
+  Box,
+  Typography,
   Rating,
   Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Box,
-  Tooltip
+  useMediaQuery,
+  useTheme,
+  Card,
+  CardContent,
+  Stack
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import WarningIcon from '@mui/icons-material/Warning';
-import { feedbackAPI } from '../services/api';
+import { Delete, Email, Person } from '@mui/icons-material';
 
-const FeedbackTable = ({ feedbacks, onDelete }) => {
-  const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null, name: '' });
-
-  const handleDeleteClick = (id, name) => {
-    setDeleteDialog({ open: true, id, name });
-  };
-
-  const handleDeleteConfirm = async () => {
-    try {
-      await feedbackAPI.delete(deleteDialog.id);
-      onDelete(deleteDialog.id);
-      setDeleteDialog({ open: false, id: null, name: '' });
-    } catch (error) {
-      console.error('Delete failed:', error);
-      alert('Failed to delete feedback');
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteDialog({ open: false, id: null, name: '' });
-  };
+const FeedbackTable = ({ feedbacks, onDelete, isMobile }) => {
+  const theme = useTheme();
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString('en-US', {
-      year: 'numeric',
+    return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
+      year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
     });
   };
 
-  return (
-    <>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="feedback table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Rating</TableCell>
-              <TableCell>Message</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {feedbacks.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6}>
-                  <Box sx={{ textAlign: 'center', py: 3 }}>
-                    <Typography variant="h6" color="text.secondary">
-                      No feedback found
+  // Mobile Card View
+  if (isMobile) {
+    return (
+      <Box sx={{ p: 1 }}>
+        <Stack spacing={2}>
+          {feedbacks.map((feedback) => (
+            <Card key={feedback._id} sx={{ borderRadius: 2 }}>
+              <CardContent sx={{ p: 2 }}>
+                {/* Header */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                  <Box>
+                    <Typography variant="subtitle1" fontWeight="600" gutterBottom>
+                      {feedback.name}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Feedbacks will appear here once submitted
+                    <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                      <Email sx={{ fontSize: 16, mr: 0.5 }} />
+                      {feedback.email}
                     </Typography>
                   </Box>
-                </TableCell>
-              </TableRow>
-            ) : (
-              feedbacks.map((feedback) => (
-                <TableRow key={feedback._id}>
-                  <TableCell>{feedback.name}</TableCell>
-                  <TableCell>{feedback.email}</TableCell>
-                  <TableCell>
-                    <Rating value={feedback.rating} readOnly size="small" />
-                  </TableCell>
-                  <TableCell>
-                    <Tooltip title={feedback.message}>
-                      <Typography
-                        sx={{
-                          maxWidth: 200,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis'
-                        }}
-                      >
-                        {feedback.message}
-                      </Typography>
-                    </Tooltip>
-                  </TableCell>
-                  <TableCell>{formatDate(feedback.createdAt)}</TableCell>
-                  <TableCell align="right">
-                    <IconButton
-                      color="error"
-                      onClick={() => handleDeleteClick(feedback._id, feedback.name)}
-                      sx={{
-                        '&:hover': {
-                          backgroundColor: 'rgba(211, 47, 47, 0.1)'
-                        }
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                  <IconButton 
+                    size="small" 
+                    color="error" 
+                    onClick={() => onDelete(feedback._id)}
+                    sx={{ ml: 1 }}
+                  >
+                    <Delete fontSize="small" />
+                  </IconButton>
+                </Box>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialog.open} onClose={handleDeleteCancel}>
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <WarningIcon color="warning" />
-          Confirm Delete
-        </DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete feedback from {deleteDialog.name}?
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            This action cannot be undone.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteCancel}>Cancel</Button>
-          <Button
-            color="error"
-            variant="contained"
-            onClick={handleDeleteConfirm}
-            startIcon={<DeleteIcon />}
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+                {/* Rating */}
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Rating value={feedback.rating} readOnly size="small" />
+                  <Chip 
+                    label={`${feedback.rating}/5`} 
+                    size="small" 
+                    color="primary" 
+                    variant="outlined"
+                    sx={{ ml: 1, height: 24 }}
+                  />
+                </Box>
+
+                {/* Message */}
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    mb: 2,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {feedback.message}
+                </Typography>
+
+                {/* Date */}
+                <Typography variant="caption" color="text.secondary">
+                  {formatDate(feedback.createdAt)}
+                </Typography>
+              </CardContent>
+            </Card>
+          ))}
+        </Stack>
+      </Box>
+    );
+  }
+
+  // Desktop Table View
+  return (
+    <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+      <Table>
+        <TableHead sx={{ backgroundColor: 'primary.light' }}>
+          <TableRow>
+            <TableCell sx={{ color: 'white', fontWeight: 600 }}>Name</TableCell>
+            <TableCell sx={{ color: 'white', fontWeight: 600 }}>Email</TableCell>
+            <TableCell sx={{ color: 'white', fontWeight: 600 }}>Rating</TableCell>
+            <TableCell sx={{ color: 'white', fontWeight: 600 }}>Message</TableCell>
+            <TableCell sx={{ color: 'white', fontWeight: 600 }}>Date</TableCell>
+            <TableCell sx={{ color: 'white', fontWeight: 600 }} align="center">Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {feedbacks.map((feedback) => (
+            <TableRow 
+              key={feedback._id} 
+              sx={{ 
+                '&:hover': { backgroundColor: 'action.hover' },
+                '&:last-child td, &:last-child th': { border: 0 }
+              }}
+            >
+              <TableCell>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Person sx={{ mr: 1, color: 'primary.main', fontSize: 20 }} />
+                  <Typography variant="body2" fontWeight="500">
+                    {feedback.name}
+                  </Typography>
+                </Box>
+              </TableCell>
+              <TableCell>
+                <Typography variant="body2" color="primary.main">
+                  {feedback.email}
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Rating value={feedback.rating} readOnly size="small" />
+                  <Chip 
+                    label={`${feedback.rating}/5`} 
+                    size="small" 
+                    color="primary" 
+                    variant="outlined"
+                  />
+                </Box>
+              </TableCell>
+              <TableCell sx={{ maxWidth: 300 }}>
+                <Typography 
+                  variant="body2" 
+                  sx={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {feedback.message}
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography variant="body2" color="text.secondary">
+                  {formatDate(feedback.createdAt)}
+                </Typography>
+              </TableCell>
+              <TableCell align="center">
+                <IconButton
+                  color="error"
+                  onClick={() => onDelete(feedback._id)}
+                  size="small"
+                >
+                  <Delete />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 
