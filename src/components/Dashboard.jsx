@@ -10,7 +10,8 @@ import {
   CircularProgress,
   Alert,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Snackbar, Alert as MuiAlert // for toast
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FeedbackIcon from '@mui/icons-material/Feedback';
@@ -29,6 +30,11 @@ const Dashboard = () => {
     total: 0,
     avgRating: 0,
     distribution: []
+  });
+  const [toast, setToast] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
   });
 
   // Mobile responsiveness hooks
@@ -82,7 +88,23 @@ const Dashboard = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  // const handleDelete = async (id) => {
+  //   setError('');
+  //   try {
+  //     const resp = await feedbackAPI.delete(id);
+  //     if (resp?.data?.success) {
+  //       setFeedbacks((prev) => prev.filter((f) => f._id !== id));
+  //       setFilteredFeedbacks((prev) => prev.filter((f) => f._id !== id));
+  //       fetchAll();
+  //     } else {
+  //       throw new Error(resp?.data?.message || 'Delete failed');
+  //     }
+  //   } catch (err) {
+  //     console.error('Delete failed', err);
+  //     setError(err.response?.data?.message || err.message || 'Failed to delete feedback');
+  //   }
+  // };
+ const handleDelete = async (id) => {
     setError('');
     try {
       const resp = await feedbackAPI.delete(id);
@@ -90,13 +112,29 @@ const Dashboard = () => {
         setFeedbacks((prev) => prev.filter((f) => f._id !== id));
         setFilteredFeedbacks((prev) => prev.filter((f) => f._id !== id));
         fetchAll();
+        setToast({
+          open: true,
+          message: 'Feedback deleted successfully',
+          severity: 'success'
+        });
       } else {
         throw new Error(resp?.data?.message || 'Delete failed');
       }
     } catch (err) {
       console.error('Delete failed', err);
       setError(err.response?.data?.message || err.message || 'Failed to delete feedback');
+      setToast({
+        open: true,
+        message: 'Failed to delete feedback',
+        severity: 'error'
+      });
     }
+  };
+
+  // Add handleCloseToast function
+  const handleCloseToast = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setToast({ ...toast, open: false });
   };
 
   return (
@@ -105,6 +143,27 @@ const Dashboard = () => {
       minHeight: '100vh',
       backgroundColor: '#f8fafc'
     }}>
+
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={4000}
+        onClose={handleCloseToast}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          severity={toast.severity}
+          onClose={handleCloseToast}
+          sx={{ 
+            width: '100%',
+            fontSize: isMobile ? '14px' : '16px'
+          }}
+        >
+          {toast.message}
+        </MuiAlert>
+      </Snackbar>
+
       {/* Welcome Section */}
       <Box sx={{ 
         mb: isMobile ? 2 : 3,
@@ -395,6 +454,10 @@ const Dashboard = () => {
           </Typography>
         </Box>
       )}
+
+
+
+      
     </Box>
   );
 };

@@ -1,10 +1,8 @@
 import { Box, Container, Paper, Typography, Fade } from '@mui/material';
 import { useTheme, useMediaQuery } from '@mui/material';
 import FeedbackForm from '../components/FeedbackForm';
-// import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
 import FeaturesSection from '../components/FeaturesSection';
-import TrustIndicators from '../components/TrustIndicators';
 import BackgroundElements from '../components/BackgroundElements';
 
 const Home = () => {
@@ -18,10 +16,7 @@ const Home = () => {
       position: 'relative',
       overflow: 'hidden'
     }}>
-      {/* Background Elements */}
       <BackgroundElements />
-
-      {/* <Navbar /> */}
 
       <Container 
         maxWidth="lg" 
@@ -31,13 +26,10 @@ const Home = () => {
           py: isMobile ? 4 : 6
         }}
       >
-        {/* Hero Section */}
         <HeroSection />
 
-        {/* Features Section */}
         <FeaturesSection />
 
-        {/* Feedback Form Section */}
         <Fade in timeout={1200}>
           <Box>
             <Paper
@@ -79,9 +71,6 @@ const Home = () => {
             </Paper>
           </Box>
         </Fade>
-
-        {/* Trust Indicators */}
-        <TrustIndicators />
       </Container>
     </Box>
   );

@@ -7,9 +7,9 @@ const AdminPanel = () => {
   return (
     <>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <PrivateRoute>
+        {/* <PrivateRoute> */}
           <Dashboard />
-        </PrivateRoute>
+        {/* </PrivateRoute> */}
       </Container>
     </>
   );

@@ -1,8 +1,21 @@
+// import React from 'react';
+// import { Navigate } from 'react-router-dom';
+
+// const PrivateRoute = ({ children }) => {
+//   const token = localStorage.getItem('adminToken');
+//   return token ? children : <Navigate to="/admin/login" replace />;
+// };
+
+// export default PrivateRoute;
+
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('adminToken');
+  
+  // If admin is logged in, show the protected content
+  // Otherwise, redirect to login
   return token ? children : <Navigate to="/admin/login" replace />;
 };
 
